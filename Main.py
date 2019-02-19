@@ -1,6 +1,7 @@
 
 #! /usr/bin/env python
 # -*- coding: utf-8 -*- 
+import re
 import sys
 import os
 import time
@@ -14,9 +15,11 @@ from ReadJson import read_config
 def script(urls, tg_chat):
     now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     for url in urls:
+        url = re.match('(http|https)://(www.)?(\w+(-?)(\.)?)+', url).group()
         url = url.replace('https://', '')
         filename = 'logs/%s/%s.txt' % (url.replace('http://', ''), time.strftime(
             "%Y-%m-%d", time.localtime(time.time())))
+        path = 'logs/%s' % url.replace('http://', '')
         # vist page
         url_result = VisitPage(url)
         status = url_result.visit()
@@ -60,12 +63,12 @@ def script(urls, tg_chat):
                         send_notify = SendNotify(message)
                         send_notify.sendTo()
                     else:
-                        print u"End Record %s" % (explode[2])
+                        print u"End Record %s - %s" % (url, explode[2])
             else:
                 print u"File no exit"
-        path_exit = os.path.exists('logs/%s' % url.replace('http://', ''))
+        path_exit = os.path.exists(path)
         if path_exit == False:
-            os.mkdir('logs/%s' % url.replace('http://', '')) 
+            os.mkdir(path) 
         data = '\n' + url + '-----' + time.strftime("%H:%M:%S", time.localtime(time.time())) + '-----' + status
         file = open(filename, 'a', encoding='utf-8')
         file.write(data)
