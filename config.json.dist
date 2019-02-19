@@ -1,0 +1,5 @@
+{
+    "urls": [], // 需要监听的Url
+    "tg-chat": "", // tg bot
+    "time_interval_num": 5 //监听间隔
+}
