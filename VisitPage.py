@@ -1,7 +1,7 @@
 import sys
 import requests
 from RequestsHeader import req_headers
-
+import urllib3
 
 class VisitPage(object):
     def __init__(self, url):
@@ -9,9 +9,10 @@ class VisitPage(object):
 
     def visit(self):
         try:
-            res = requests.get(self.url, headers=req_headers,
+            urllib3.disable_warnings()
+            res = requests.get(self.url, verify=False, headers=req_headers,
                                allow_redirects=True)
             code = res.status_code
             return str(code)
-        except:
+        except Exception as e:
             return '-1'
