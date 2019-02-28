@@ -15,13 +15,14 @@ from ReadJson import read_config
 def script(urls, tg_chat):
     now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     for url in urls:
+        actualUrl = url
         url = re.match('(http|https)://(www.)?(\w+(-?)(\.)?)+', url).group()
         url = url.replace('https://', '')
         filename = 'logs/%s/%s.txt' % (url.replace('http://', ''), time.strftime(
             "%Y-%m-%d", time.localtime(time.time())))
         path = 'logs/%s' % url.replace('http://', '')
         # vist page
-        url_result = VisitPage(url)
+        url_result = VisitPage(actualUrl)
         status = url_result.visit()
         # send notify
         if status == '-1' or status == '500' or status == '502': # 502 & 500
@@ -37,13 +38,13 @@ def script(urls, tg_chat):
                 else:
                     explode = data.split('-----')
                     if explode[2] == '200\n' or data == '\n':
-                        message = u"Website:%s no open %s" % (url, now_time)
+                        message = u"Website:%s no open %s" % (actualUrl, now_time)
                         send_notify = SendNotify(message)
                         send_notify.sendTo()
             else:
                 print u"File no exit"
                 # TODO 
-                message = u"Website:%s no open %s" % (url, now_time)
+                message = u"Website:%s no open %s" % (actualUrl, now_time)
                 send_notify = SendNotify(message)
                 send_notify.sendTo()
         else:
@@ -59,17 +60,17 @@ def script(urls, tg_chat):
                 else:
                     explode = data.split('-----')
                     if explode[2] == '-1\n' or explode[2] == '500\n' or explode[2] == '502\n':
-                        message = u"Website:%s on %s restore" % (url, now_time)
+                        message = u"Website:%s on %s restore" % (actualUrl, now_time)
                         send_notify = SendNotify(message)
                         send_notify.sendTo()
                     else:
-                        print u"End Record %s - %s" % (url, explode[2])
+                        print u"End Record %s - %s" % (actualUrl, explode[2])
             else:
                 print u"File no exit"
         path_exit = os.path.exists(path)
         if path_exit == False:
             os.mkdir(path) 
-        data = '\n' + url + '-----' + time.strftime("%H:%M:%S", time.localtime(time.time())) + '-----' + status
+        data = '\n' + actualUrl + '-----' + time.strftime("%H:%M:%S", time.localtime(time.time())) + '-----' + status
         file = open(filename, 'a', encoding='utf-8')
         file.write(data)
         file.close
